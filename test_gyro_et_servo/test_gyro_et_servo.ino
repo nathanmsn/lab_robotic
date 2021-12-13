@@ -7,8 +7,8 @@
 int position1 = 0;
 int position2 = 0;
 Servo servo1, servo2;
-double pitch[10];
-double yaw[10];
+double deltaPitch = 0;
+double deltaYaw = 0;
 int counter = 0;
 
 // Pinout 
@@ -53,8 +53,8 @@ void loop()
   
   // Conversion pitch/Roll / Yaw
   ComputeAngle(GyAccTemp, PitchRoll);
-  pitch[counter] = PitchRoll[0];
-  yaw[counter] = PitchRoll[2];
+  deltaPitch = PitchRoll[0] + deltaPitch;
+  deltaYaw = PitchRoll[2] + deltaYaw;
 
   // Affichage dans le port série Roll/Pitch/ Yaw en °
 
@@ -69,15 +69,16 @@ void loop()
   delay(100);
   counter++;
   if(counter == 9){
-    double deltaPitch = pitch[9] - pitch[0];
-    double deltaYaw = yaw[9] - yaw[0];
+    
     if(deltaPitch > deltaYaw){
-      servo1.write(pitch[9]);
+      servo1.write(PitchRoll[0]);
     }
     else if(deltaYaw > deltaPitch){
-      servo2.write(yaw[9]);
+      servo2.write(PitchRoll[2]);
     }
     counter = 0;
+    deltaPitch = 0;
+    deltaYaw = 0;
   }
   
 
