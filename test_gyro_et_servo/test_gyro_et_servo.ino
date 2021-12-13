@@ -7,6 +7,9 @@
 int position1 = 0;
 int position2 = 0;
 Servo servo1, servo2;
+double pitch[10];
+double yaw[10];
+int counter = 0;
 
 // Pinout 
 /*
@@ -22,8 +25,8 @@ Servo servo1, servo2;
  */
  
 int  GyAccTemp[NumData];
-int  GATCorr[NumData]={0,0,0,0,0,0,0};
-//int  GATCorr[NumData]={-950,-300,0,-1600,480,170,210};
+//int  GATCorr[NumData]={0,0,0,0,0,0,0};
+int  GATCorr[NumData]={-950,-300,0,-1600,480,170,210};
 
 double PitchRoll[3];
 
@@ -43,11 +46,15 @@ void setup()
 }
 void loop()
 {
+
+  
   // Lecture du capteur 
   ReadGY521( GyAccTemp, GATCorr);
   
   // Conversion pitch/Roll / Yaw
   ComputeAngle(GyAccTemp, PitchRoll);
+  pitch[counter] = PitchRoll[0];
+  yaw[counter] = PitchRoll[2];
 
   // Affichage dans le port série Roll/Pitch/ Yaw en °
 
@@ -57,9 +64,21 @@ void loop()
   Serial.println(PitchRoll[2]); //Serial.print(";");
 
 
-  servos(PitchRoll[0], PitchRoll[1]);
+  servo();
 
   delay(100);
+  counter++;
+  if(counter == 9){
+    double deltaPitch = pitch[9] - pitch[0];
+    double deltaYaw = yaw[9] - yaw[0];
+    if(deltaPitch > deltaYaw){
+      servo1.write(pitch[9]);
+    }
+    else if(deltaYaw > deltaPitch){
+      servo2.write(yaw[9]);
+    }
+    counter = 0;
+  }
   
 
   
@@ -108,23 +127,8 @@ void ComputeAngle(int *GyAccTempp,  double *PitchRol)
   PitchRol[2] = PitchRol[2] * (180.0/pi) ;
 }
 
-void servos(int pitch, int roll){
-  servo1.write(pitch);
-  servo2.write(roll);
+void servo(){
 
-  /*
-  for(int i = position1; i <= pitch; i++){
-    servo1.write(i);
-  }
-  for(int i = position1; i >= pitch; i--){
-    servo1.write(i);
-  }
-  for(int i = position2; i >= roll; i--){
-    servo2.write(i);
-  }
-    for(int i = position2; i >= roll; i--){
-    servo2.write(i);
-  }*/
   
   
 }
