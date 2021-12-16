@@ -67,11 +67,14 @@ void loop()
   servo();
 
   delay(100);
-  counter++;
+  
   if(counter == 9){
     
     if(deltaPitch > deltaYaw){
-      servo1.write(PitchRoll[0]);
+      if(PitchRoll[0] > 20 && PitchRoll[0] < 120){
+        position1 = deltaPitch/10 + position1
+        servo1.write(position1);
+      }
     }
     else if(deltaYaw > deltaPitch){
       servo2.write(PitchRoll[2]);
@@ -80,6 +83,7 @@ void loop()
     deltaPitch = 0;
     deltaYaw = 0;
   }
+  counter++;
   
 
   
